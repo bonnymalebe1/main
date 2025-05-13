@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Guess the Number</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      background: #eef2f3;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 24px;
+    }
+
+    select, input[type="number"], button {
+      padding: 12px;
+      font-size: 16px;
+      margin: 10px;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    button {
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #resetBtn {
+      background-color: #2196F3;
+    }
+
+    #resetBtn:hover {
+      background-color: #1976D2;
+    }
+
+    #result {
+      font-weight: bold;
+      font-size: 20px;
+      color: #ff5722;
+      margin-top: 20px;
+    }
+
+    #tries, #score, #timer {
+      color: #555;
+    }
+
+    .celebrate {
+      animation: pop 0.5s ease-out alternate 3;
+    }
+
+    @keyframes pop {
+      from { transform: scale(1); }
+      to { transform: scale(1.2); color: green; }
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Guess the Number Game</h1>
+
+  <label for="difficulty">Difficulty:</label>
+  <select id="difficulty" onchange="setDifficulty()">
+    <option value="10">Easy (1–10)</option>
+    <option value="50">Medium (1–50)</option>
+    <option value="100">Hard (1–100)</option>
+  </select><br/>
+
+  <label>
+    <input type="checkbox" id="timerMode" onchange="toggleTimer()"> Challenge Mode (20s)
+  </label><br/>
+
+  <input type="number" id="userGuess" placeholder="Enter your guess" />
+  <button onclick="checkGuess()" id="submitBtn">Submit</button>
+  <button onclick="resetGame()" id="resetBtn" style="display: none;">Play Again</button>
+
+  <p id="result"></p>
+  <p id="tries"></p>
+  <p id="score">Wins: 0</p>
+  <p id="timer" style="font-weight:bold;"></p>
+
+  <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-01.mp3"></audio>
+  <audio id="failSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+
+  <script>
+    let max = 10;
+    let secretNumber = Math.floor(Math.random() * max) + 1;
+    let attempts = 0;
+    let wins = 0;
+    let countdown;
+    let timeLeft = 20;
+    let challenge = false;
+
+    function setDifficulty() {
+      max = Number(document.getElementById("difficulty").value);
+      resetGame(true);
+    }
+
+    function toggleTimer() {
+      challenge = document.getElementById("timerMode").checked;
+      resetGame(true);
+    }
+
+    function startTimer() {
+      clearInterval(countdown);
+      timeLeft = 20;
+      document.getElementById("timer").textContent = "Time left: 20s";
+
+      countdown = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = "Time left: " + timeLeft + "s";
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          document.getElementById("result").textContent = "Time's up! You lost!";
+          document.getElementById("submitBtn").disabled = true;
+          document.getElementById("resetBtn").style.display = "inline";
+          document.getElementById("failSound").play();
+        }
+      }, 1000);
+    }
+
+    function checkGuess() {
+      const guess = Number(document.getElementById("userGuess").value);
+      const result = document.getElementById("result");
+      const tries = document.getElementById("tries");
+
+      if (challenge && timeLeft <= 0) return;
+
+      attempts++;
+
+      if (guess === secretNumber) {
+        clearInterval(countdown);
+        result.textContent = "Congratulations! You guessed it!";
+        result.classList.add("celebrate");
+        tries.textContent = "It took you " + attempts + " tries.";
+        document.getElementById("submitBtn").disabled = true;
+        document.getElementById("resetBtn").style.display = "inline";
+        wins++;
+        document.getElementById("score").textContent = "Wins: " + wins;
+        document.getElementById("winSound").play();
+      } else if (guess < secretNumber) {
+        result.textContent = "Too low! Try again.";
+      } else {
+        result.textContent = "Too high! Try again.";
+      }
+    }
+
+    function resetGame(keepScore = false) {
+      secretNumber = Math.floor(Math.random() * max) + 1;
+      attempts = 0;
+      document.getElementById("userGuess").value = "";
+      document.getElementById("result").textContent = "";
+      document.getElementById("result").classList.remove("celebrate");
+      document.getElementById("tries").textContent = "";
+      document.getElementById("submitBtn").disabled = false;
+      document.getElementById("resetBtn").style.display = "none";
+      if (!keepScore) {
+        wins = 0;
+        document.getElementById("score").textContent = "Wins: 0";
+      }
+      document.getElementById("timer").textContent = "";
+      clearInterval(countdown);
+      if (challenge) {
+        startTimer();
+      }
+    }
+
+    // Start game initially
+    if (challenge) startTimer();
+  </script>
+</body>
+</html>
