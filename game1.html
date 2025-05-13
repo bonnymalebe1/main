@@ -78,8 +78,8 @@
   <label for="difficulty">Difficulty:</label>
   <select id="difficulty" onchange="setDifficulty()">
     <option value="10">Easy (1–10)</option>
-    <option value="50">Medium (1–50)</option>
-    <option value="100">Hard (1–100)</option>
+    <option value="50">Medium (1–15)</option>
+    <option value="100">Hard (1–20)</option>
   </select><br/>
 
   <label>
@@ -119,8 +119,8 @@
 
     function startTimer() {
       clearInterval(countdown);
-      timeLeft = 20;
-      document.getElementById("timer").textContent = "Time left: 20s";
+      timeLeft = 10;
+      document.getElementById("timer").textContent = "Time left: 10s";
 
       countdown = setInterval(() => {
         timeLeft--;
@@ -155,9 +155,9 @@
         document.getElementById("score").textContent = "Wins: " + wins;
         document.getElementById("winSound").play();
       } else if (guess < secretNumber) {
-        result.textContent = "Too low! Try again.";
+        result.textContent = "HAHAHA Too low! Try again.";
       } else {
-        result.textContent = "Too high! Try again.";
+        result.textContent = "SORRY Too high! Try again.";
       }
     }
 
